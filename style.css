@@ -1,7 +1,7 @@
 html {
 	background-color: #dedede;
 	height: 100%;
-	font-family: monospace;
+	font-family: "Roboto", sans-serif;
 }
 
 body {
@@ -22,7 +22,7 @@ body {
 
 	/* min-height: 100px;
 	max-height: 1000px; */
-	height: 70vh;
+	height: 75vh;
 
 	/* border: 1px solid black; */
 	border-radius: 10px;
@@ -61,16 +61,22 @@ body {
 	font-size: large;
 	border-radius: 5px;
 	border: none;
+	padding: 0;
+	margin: 0;
+}
+
+#input > *:focus-visible {
+	outline: none;
 }
 
 #input > *:hover {
 	background-color: #bcbcbc;
 }
 
-#equals {
+#input :last-child {
 	grid-column: 3 / 5;
 }
 
 #currOperand {
-	font-size: xx-large;
+	font-size: x-large;
 }
