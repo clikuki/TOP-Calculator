@@ -13,7 +13,7 @@
     "rules": {
         "max-len": ["error", {"code": 100, "ignoreComments": true, "ignoreStrings": true, "ignoreTemplateLiterals": true}],
         "no-plusplus": ["error", {"allowForLoopAfterthoughts": true}],
-        "indent": ["error", "tab"],
+        "indent": ["error", "tab", {"SwitchCase": 1}],
         "prefer-destructuring": "off",
         "linebreak-style": "off",
         "one-var": "off",
@@ -24,6 +24,8 @@
         "consistent-return": "off",
         "no-param-reassign": "off",
         "no-floating-decimal": "off",
-        "arrow-body-style": "off"
+        "arrow-body-style": "off",
+        "no-restricted-syntax": "off",
+        "no-console": "off"
     }
 }
