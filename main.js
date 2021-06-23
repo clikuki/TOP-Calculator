@@ -82,7 +82,8 @@ function deleteNum(deleteType) {
 	switch(deleteType) {
 		// DEL removes the last number inputed from the current operand
 		case 'DEL':
-			currOperand = currOperand.slice(0, -1);
+			currOperand = (+(removeSeparator(currOperand).slice(0, -1))).toLocaleString();
+			if(currOperand === '0') currOperand = '';
 			break;
 
 		// CE resets all of the operands and the operation
@@ -102,6 +103,7 @@ function deleteNum(deleteType) {
 	}
 }
 
+// removes
 function removeSeparator(str) {
 	return str.replace(/,/g, '');
 }
@@ -111,11 +113,60 @@ function updateDisplay() {
 	currOperandDisplay.textContent = currOperand;
 }
 
+function setFocus() {
+	operationBtns[operationBtns.length - 1].focus();
+}
+
+function handleKeyboard(e) {
+	const key = e.key;
+
+	switch(key) {
+		case '+':
+		case '-':
+			setOperation(key);
+			break;
+
+		case '/':
+			setOperation('÷');
+			break;
+
+		case '*':
+			setOperation('×');
+			break;
+
+		case '=':
+			if(prevOperand !== '' && currOperand !== '') {
+				compute();
+			}
+			break;
+
+		case '.':
+			appendNum('.');
+			break;
+
+		case 'Backspace':
+			if(e.ctrlKey) deleteNum('C');
+			else deleteNum('DEL');
+			break;
+
+		default: // Check for num keys
+			if(key.match(/[0-9]/)) appendNum(key);
+			break;
+	}
+}
+
 function setEventListeners() {
+	window.addEventListener('keydown', (e) => {
+		e.preventDefault();
+		handleKeyboard(e);
+		updateDisplay();
+	});
+
 	for(const btn of numBtns) {
 		btn.addEventListener('click', (e) => {
 			appendNum(e.target.textContent);
 			updateDisplay();
+			setFocus();
 		});
 	}
 
@@ -123,6 +174,7 @@ function setEventListeners() {
 		btn.addEventListener('click', (e) => {
 			setOperation(e.target.textContent);
 			updateDisplay();
+			setFocus();
 		});
 	}
 
@@ -130,6 +182,7 @@ function setEventListeners() {
 		btn.addEventListener('click', (e) => {
 			deleteNum(e.target.textContent);
 			updateDisplay();
+			setFocus();
 		});
 	}
 }
