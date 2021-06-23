@@ -26,6 +26,6 @@
         "no-floating-decimal": "off",
         "arrow-body-style": "off",
         "no-restricted-syntax": "off",
-        "no-console": "off"
+        "no-alert": "off"
     }
 }

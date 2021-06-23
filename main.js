@@ -20,6 +20,8 @@ function appendNum(num) {
 		}
 
 		currOperand += '.';
+	}else if(num === '0' && currOperand === '') {
+		currOperand = '0';
 	}else {
 		currOperand = (+(removeSeparator(currOperand) + num)).toLocaleString();
 	}
@@ -64,7 +66,10 @@ function compute() {
 			break;
 
 		case '÷':
-			if(+currOperand === 0) return;
+			if(+currOperand === 0) {
+				alertIfDivideByZero();
+				return;
+			}
 			newOperand = +removeSeparator(prevOperand) / +removeSeparator(currOperand);
 			break;
 
@@ -75,6 +80,10 @@ function compute() {
 	currOperand = (+(newOperand.toFixed(2))).toLocaleString();
 	prevOperand = '';
 	currOperation = '';
+}
+
+function alertIfDivideByZero() {
+	alert('No dividing by 0!');
 }
 
 // does all the delete functions
@@ -175,36 +184,38 @@ function handleKeyboard(e) {
 	// console.log(e);
 }
 
+function afterBtnPress() {
+	updateDisplay();
+	setFocusToEqualsBtn();
+}
+
 function setEventListeners() {
 	window.addEventListener('keydown', (e) => {
 		// return if ctrl+shift+I for debugging purposes
 		if(e.ctrlKey && e.shiftKey && e.key === 'I') return;
 		e.preventDefault();
 		handleKeyboard(e);
-		updateDisplay();
+		afterBtnPress();
 	});
 
 	for(const btn of numBtns) {
 		btn.addEventListener('click', (e) => {
 			appendNum(e.target.textContent);
-			updateDisplay();
-			setFocusToEqualsBtn();
+			afterBtnPress();
 		});
 	}
 
 	for(const btn of operationBtns) {
 		btn.addEventListener('click', (e) => {
 			setOperation(e.target.textContent);
-			updateDisplay();
-			setFocusToEqualsBtn();
+			afterBtnPress();
 		});
 	}
 
 	for(const btn of deleteBtns) {
 		btn.addEventListener('click', (e) => {
 			deleteNum(e.target.textContent);
-			updateDisplay();
-			setFocusToEqualsBtn();
+			afterBtnPress();
 		});
 	}
 }
