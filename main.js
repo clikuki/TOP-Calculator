@@ -177,6 +177,8 @@ function handleKeyboard(e) {
 
 function setEventListeners() {
 	window.addEventListener('keydown', (e) => {
+		// return if ctrl+shift+I for debugging purposes
+		if(e.ctrlKey && e.shiftKey && e.key === 'I') return;
 		e.preventDefault();
 		handleKeyboard(e);
 		updateDisplay();

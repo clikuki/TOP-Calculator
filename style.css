@@ -20,15 +20,32 @@ body {
 	max-width: 300px;
 	width: 70vw;
 
-	/* min-height: 100px;
-	max-height: 1000px; */
 	height: 75vh;
 
-	/* border: 1px solid black; */
 	border-radius: 10px;
 	padding: 10px;
 
 	background-color: #9a9a9a;
+
+	text-align: center;
+}
+
+#credits {
+	padding-top: 10px;
+	font-family: monospace;
+}
+
+#credits > a {
+	text-decoration: none;
+	color: inherit;
+}
+
+#credits > a:hover {
+	text-decoration: underline;
+}
+
+#credits > a:focus-visible {
+	outline: none;
 }
 
 #display {
