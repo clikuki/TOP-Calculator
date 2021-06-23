@@ -10,6 +10,8 @@ let currOperand = '';
 
 // append a number to the current operand
 function appendNum(num) {
+	if(removeSeparator(currOperand).length >= 15) return;
+
 	if(num === '.') {
 		if(currOperand.includes('.')) return;
 
@@ -19,52 +21,58 @@ function appendNum(num) {
 
 		currOperand += '.';
 	}else {
-		currOperand = (+(currOperand + num)).toString();
+		currOperand = (+(removeSeparator(currOperand) + num)).toLocaleString();
 	}
 }
 
 // set the operation
 function setOperation(operation) {
-	// don't set operation if current operand is empty
-	if(currOperand === '') return;
+	// don't set operation if current and previous operand is empty
+	if(currOperand === '' && prevOperand === '') return;
 
-	if(currOperand !== ''
-	&& prevOperand !== '') {
+	if(currOperand !== '' && prevOperand !== '') {
 		// if current and previous operand arent empty, then compute and set operation
 		compute();
 	}
 
 	if(operation === '=') return;
 
-	// else, move the current operand to previous operand and set operation
-	prevOperand = currOperand;
-	currOperand = '';
-	currOperation = operation;
+	if(prevOperand !== ''
+	&& currOperation !== '') {
+		currOperation = operation;
+	}else {
+		prevOperand = currOperand;
+		currOperand = '';
+		currOperation = operation;
+	}
 }
 
 function compute() {
+	let newOperand;
+
 	switch(currOperation) {
 		case '+':
-			currOperand = +prevOperand + +currOperand;
+			newOperand = +removeSeparator(prevOperand) + +removeSeparator(currOperand);
 			break;
 
 		case '-':
-			currOperand = +prevOperand - +currOperand;
+			newOperand = +removeSeparator(prevOperand) - +removeSeparator(currOperand);
 			break;
 
 		case '×':
-			currOperand = +prevOperand * +currOperand;
+			newOperand = +removeSeparator(prevOperand) * +removeSeparator(currOperand);
 			break;
 
 		case '÷':
 			if(+currOperand === 0) return;
-			currOperand = +((+prevOperand / +currOperand).toFixed(2)).toString();
+			newOperand = +removeSeparator(prevOperand) / +removeSeparator(currOperand);
 			break;
 
 		default:
 			break;
 	}
 
+	currOperand = (+(newOperand.toFixed(2))).toLocaleString();
 	prevOperand = '';
 	currOperation = '';
 }
@@ -92,6 +100,10 @@ function deleteNum(deleteType) {
 		default:
 			break;
 	}
+}
+
+function removeSeparator(str) {
+	return str.replace(/,/g, '');
 }
 
 function updateDisplay() {
