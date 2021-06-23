@@ -69,7 +69,7 @@ function compute() {
 			break;
 
 		default:
-			break;
+			return;
 	}
 
 	currOperand = (+(newOperand.toFixed(2))).toLocaleString();
@@ -79,31 +79,43 @@ function compute() {
 
 // does all the delete functions
 function deleteNum(deleteType) {
-	switch(deleteType) {
-		// DEL removes the last number inputed from the current operand
-		case 'DEL':
-			currOperand = (+(removeSeparator(currOperand).slice(0, -1))).toLocaleString();
-			if(currOperand === '0') currOperand = '';
-			break;
+	// if current operand is empty, move prevOperand to currOperand and set current operation
+	// and previous operand as empty
+	if(currOperand === '') {
+		currOperation = '';
+		currOperand = prevOperand;
+		prevOperand = '';
+	}else {
+		switch(deleteType) {
+			// DEL removes the last number inputed from the current operand
+			case 'DEL':
+				if(currOperand[currOperand.length - 2] === '.') {
+					currOperand = currOperand.slice(0, -1);
+				}else {
+					currOperand = (+(removeSeparator(currOperand).slice(0, -1))).toLocaleString();
+				}
+				if(currOperand === '0') currOperand = '';
+				break;
 
-		// CE resets all of the operands and the operation
-		case 'CE':
-			prevOperand = '';
-			currOperation = '';
-			currOperand = '';
-			break;
+				// CE resets all of the operands and the operation
+			case 'CE':
+				prevOperand = '';
+				currOperation = '';
+				currOperand = '';
+				break;
 
-		// C clears the current operand
-		case 'C':
-			currOperand = '';
-			break;
+				// C clears the current operand
+			case 'C':
+				currOperand = '';
+				break;
 
-		default:
-			break;
+			default:
+				break;
+		}
 	}
 }
 
-// removes
+// removes comma separators
 function removeSeparator(str) {
 	return str.replace(/,/g, '');
 }
@@ -113,10 +125,12 @@ function updateDisplay() {
 	currOperandDisplay.textContent = currOperand;
 }
 
-function setFocus() {
+// set focus to the last element of operationBtns, or the equals button
+function setFocusToEqualsBtn() {
 	operationBtns[operationBtns.length - 1].focus();
 }
 
+// Handle all keyboard input
 function handleKeyboard(e) {
 	const key = e.key;
 
@@ -149,10 +163,16 @@ function handleKeyboard(e) {
 			else deleteNum('DEL');
 			break;
 
+		case 'Enter':
+			compute();
+			break;
+
 		default: // Check for num keys
 			if(key.match(/[0-9]/)) appendNum(key);
 			break;
 	}
+
+	// console.log(e);
 }
 
 function setEventListeners() {
@@ -166,7 +186,7 @@ function setEventListeners() {
 		btn.addEventListener('click', (e) => {
 			appendNum(e.target.textContent);
 			updateDisplay();
-			setFocus();
+			setFocusToEqualsBtn();
 		});
 	}
 
@@ -174,7 +194,7 @@ function setEventListeners() {
 		btn.addEventListener('click', (e) => {
 			setOperation(e.target.textContent);
 			updateDisplay();
-			setFocus();
+			setFocusToEqualsBtn();
 		});
 	}
 
@@ -182,7 +202,7 @@ function setEventListeners() {
 		btn.addEventListener('click', (e) => {
 			deleteNum(e.target.textContent);
 			updateDisplay();
-			setFocus();
+			setFocusToEqualsBtn();
 		});
 	}
 }
