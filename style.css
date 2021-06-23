@@ -96,8 +96,22 @@ body {
 
 #input :last-child {
 	grid-column: 3 / 5;
+	background-color: #3a3aff;
+	color: #ffffff;
+}
+
+#input :last-child:hover {
+	background-color: #2a2aff;
 }
 
 #currOperand {
 	font-size: x-large;
+}
+
+.delete {
+	background-color: #ff5a5a;
+}
+
+.delete:hover {
+	background-color: #ff4a4a !important;
 }
