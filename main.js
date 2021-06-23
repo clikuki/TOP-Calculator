@@ -29,6 +29,12 @@ function appendNum(num) {
 
 // set the operation
 function setOperation(operation) {
+	// if current operand is empty and operation is -, then set as negative
+	if(operation === '-' && (currOperand === '' || currOperand === '-')) {
+		currOperand = '-';
+		return;
+	}
+
 	// don't set operation if current and previous operand is empty
 	if(currOperand === '' && prevOperand === '') return;
 
@@ -146,7 +152,11 @@ function handleKeyboard(e) {
 	switch(key) {
 		case '+':
 		case '-':
-			setOperation(key);
+			if(e.ctrlKey) {
+				currOperand = `-${currOperand}`;
+			}else {
+				setOperation(key);
+			}
 			break;
 
 		case '/':
@@ -154,6 +164,7 @@ function handleKeyboard(e) {
 			break;
 
 		case '*':
+		case 'x':
 			setOperation('×');
 			break;
 
@@ -193,6 +204,7 @@ function setEventListeners() {
 	window.addEventListener('keydown', (e) => {
 		// return if ctrl+shift+I for debugging purposes
 		if(e.ctrlKey && e.shiftKey && e.key === 'I') return;
+		if(e.ctrlKey && e.key === 'r') return;
 		e.preventDefault();
 		handleKeyboard(e);
 		afterBtnPress();

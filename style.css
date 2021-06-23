@@ -31,7 +31,11 @@ body {
 }
 
 #credits {
-	padding-top: 10px;
+	background-color: #797979;
+	margin-top: 10px;
+	border-radius: 10px;
+	padding: 2px;
+	color: #ffffff;
 	font-family: monospace;
 }
 
@@ -49,7 +53,7 @@ body {
 }
 
 #display {
-	/* border: 1px solid black; */
+	color: #ffffff;
 	border-radius: 10px;
 	background-color: #797979;
 
