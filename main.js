@@ -60,28 +60,30 @@ function setOperation(operation) {
 }
 
 function compute() {
+	const a = +removeSeparator(prevOperand);
+	const b = parseFloat(removeSeparator(currOperand) + removeSeparator(afterDecimal));
+
 	let newOperand;
-	currOperand = `${parseFloat(removeSeparator(currOperand) + removeSeparator(afterDecimal))}`;
 
 	switch(currOperation) {
 		case '+':
-			newOperand = +removeSeparator(prevOperand) + +removeSeparator(currOperand);
+			newOperand = a + b;
 			break;
 
 		case '-':
-			newOperand = +removeSeparator(prevOperand) - +removeSeparator(currOperand);
+			newOperand = a - b;
 			break;
 
 		case '×':
-			newOperand = +removeSeparator(prevOperand) * +removeSeparator(currOperand);
+			newOperand = a * b;
 			break;
 
 		case '÷':
-			if(+currOperand === 0) {
+			if(b === 0) {
 				alertIfDivideByZero();
 				return;
 			}
-			newOperand = +removeSeparator(prevOperand) / +removeSeparator(currOperand);
+			newOperand = a / b;
 			break;
 
 		default:
