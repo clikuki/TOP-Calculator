@@ -4,6 +4,8 @@ const numBtns = document.querySelectorAll('.num');
 const operationBtns = document.querySelectorAll('.operation');
 const deleteBtns = document.querySelectorAll('.delete');
 
+const charLimit = 15; // If the numbers are larger than this, then it will overflow
+
 let prevOperand = '';
 let currOperation = '';
 let currOperand = '';
@@ -11,7 +13,7 @@ let afterDecimal = '';
 
 // append a number to the current operand
 function appendNum(num) {
-	if((removeSeparator(currOperand) + removeSeparator(afterDecimal)).length >= 15) return;
+	if((removeSeparator(currOperand) + removeSeparator(afterDecimal)).length >= charLimit) return;
 
 	if(num === '.') {
 		if(currOperand.includes('.')) return;
@@ -80,7 +82,7 @@ function compute() {
 
 		case '÷':
 			if(b === 0) {
-				alertIfDivideByZero();
+				alert('No dividing by 0!');
 				return;
 			}
 			newOperand = a / b;
@@ -90,20 +92,21 @@ function compute() {
 			return;
 	}
 
+	if(newOperand.toString().length >= charLimit) {
+		alert('Numbers are too large, please try smaller numbers');
+		return;
+	}
+
 	currOperand = (+(newOperand.toFixed(2))).toLocaleString();
 	afterDecimal = '';
 	prevOperand = '';
 	currOperation = '';
 }
 
-function alertIfDivideByZero() {
-	alert('No dividing by 0!');
-}
-
 // does all the delete functions
 function deleteNum(deleteType) {
-	// if current operand is empty, move prevOperand to currOperand and set current operation
-	// and previous operand as empty
+	// if current operand is empty, move prevOperand to currOperand and
+	// set current operation and previous operand as empty
 	if(currOperand === '') {
 		currOperation = '';
 		currOperand = prevOperand;
