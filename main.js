@@ -6,6 +6,7 @@ const deleteBtns = document.querySelectorAll('.delete');
 
 const charLimit = 15; // If the numbers are larger than this, then it will overflow
 
+let hasDecimal = false;
 let prevOperand = '';
 let currOperation = '';
 let currOperand = '';
@@ -13,25 +14,23 @@ let afterDecimal = '';
 
 // append a number to the current operand
 function appendNum(num) {
-	if(checkCharLimit(removeSeparator(currOperand) + removeSeparator(afterDecimal))) return;
+	if(checkCharLimit(currOperand + removeSeparator(afterDecimal))) return;
 
 	if(num === '.') {
-		if(currOperand.includes('.')) return;
-
 		if(currOperand === '') {
 			currOperand = '0';
 		}
 
-		currOperand += '.';
+		hasDecimal = true;
 	}else if(num === '0' && currOperand === '') {
 		currOperand = '0';
-	}else if(currOperand.includes('.')) {
+	}else if(hasDecimal) {
 		const noSeparator = removeSeparator(afterDecimal);
 
 		if(noSeparator.length % 3 === 0 && noSeparator.length !== 0) afterDecimal += ',';
 		afterDecimal += num;
 	}else {
-		currOperand = removeSeparator(currOperand) + num;
+		currOperand += num;
 	}
 }
 
@@ -71,8 +70,8 @@ function setOperation(operation) {
 }
 
 function compute() {
-	const a = +removeSeparator(prevOperand);
-	const b = parseFloat(removeSeparator(currOperand) + removeSeparator(afterDecimal));
+	const a = +prevOperand;
+	const b = parseFloat(currOperand + removeSeparator(afterDecimal));
 
 	let newOperand;
 
@@ -119,7 +118,7 @@ function checkCharLimit(str) {
 }
 
 function removeLastChar(str) {
-	return removeSeparator(str).slice(0, -1);
+	return str.slice(0, -1);
 }
 
 // does all the delete functions
@@ -135,14 +134,15 @@ function deleteNum(deleteType) {
 			// DEL removes the last number inputed from the current operand
 			case 'DEL':
 				if(afterDecimal !== '') {
-					afterDecimal = removeSeparator(removeLastChar(afterDecimal));
+					afterDecimal = removeLastChar(afterDecimal);
+
+					if(afterDecimal[afterDecimal.length - 1] === ',') {
+						afterDecimal = removeLastChar(afterDecimal);
+					}
+				}else if(hasDecimal) {
+					hasDecimal = false;
 				}else {
-					let operand = currOperand;
-
-					operand = removeLastChar(currOperand);
-					operand = removeSeparator(operand);
-
-					currOperand = operand;
+					currOperand = removeLastChar(currOperand);
 				}
 
 				if(afterDecimal === '0') afterDecimal = '';
@@ -151,6 +151,7 @@ function deleteNum(deleteType) {
 
 				// CE resets all of the operands and the operation
 			case 'CE':
+				hasDecimal = false;
 				afterDecimal = '';
 				prevOperand = '';
 				currOperation = '';
@@ -159,6 +160,7 @@ function deleteNum(deleteType) {
 
 				// C clears the current operand
 			case 'C':
+				hasDecimal = false;
 				afterDecimal = '';
 				currOperand = '';
 				break;
@@ -177,9 +179,13 @@ function removeSeparator(str) {
 function updateDisplay() {
 	if(prevOperand !== '') {
 		prevOperandDisplay.textContent = `${(+prevOperand).toLocaleString()} ${currOperation}`;
+	}else {
+		prevOperandDisplay.textContent = '';
 	}
 
-	if(currOperand.includes('.')) {
+	if(currOperand === '-') {
+		currOperandDisplay.textContent = '-';
+	}else if(hasDecimal) {
 		currOperandDisplay.textContent = `${(+currOperand).toLocaleString()}.${afterDecimal}`;
 	}else if(currOperand !== '') {
 		currOperandDisplay.textContent = `${(+currOperand).toLocaleString()}${afterDecimal}`;
