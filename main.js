@@ -7,10 +7,11 @@ const deleteBtns = document.querySelectorAll('.delete');
 let prevOperand = '';
 let currOperation = '';
 let currOperand = '';
+let afterDecimal = '';
 
 // append a number to the current operand
 function appendNum(num) {
-	if(removeSeparator(currOperand).length >= 15) return;
+	if((removeSeparator(currOperand) + removeSeparator(afterDecimal)).length >= 15) return;
 
 	if(num === '.') {
 		if(currOperand.includes('.')) return;
@@ -22,6 +23,8 @@ function appendNum(num) {
 		currOperand += '.';
 	}else if(num === '0' && currOperand === '') {
 		currOperand = '0';
+	}else if(currOperand.includes('.')) {
+		afterDecimal = (+(removeSeparator(afterDecimal) + num)).toLocaleString();
 	}else {
 		currOperand = (+(removeSeparator(currOperand) + num)).toLocaleString();
 	}
@@ -49,7 +52,8 @@ function setOperation(operation) {
 	&& currOperation !== '') {
 		currOperation = operation;
 	}else {
-		prevOperand = currOperand;
+		prevOperand = currOperand + afterDecimal;
+		afterDecimal = '';
 		currOperand = '';
 		currOperation = operation;
 	}
@@ -57,6 +61,7 @@ function setOperation(operation) {
 
 function compute() {
 	let newOperand;
+	currOperand = `${parseFloat(removeSeparator(currOperand) + removeSeparator(afterDecimal))}`;
 
 	switch(currOperation) {
 		case '+':
@@ -84,6 +89,7 @@ function compute() {
 	}
 
 	currOperand = (+(newOperand.toFixed(2))).toLocaleString();
+	afterDecimal = '';
 	prevOperand = '';
 	currOperation = '';
 }
@@ -104,16 +110,19 @@ function deleteNum(deleteType) {
 		switch(deleteType) {
 			// DEL removes the last number inputed from the current operand
 			case 'DEL':
-				if(currOperand[currOperand.length - 2] === '.') {
-					currOperand = currOperand.slice(0, -1);
+				if(afterDecimal !== '') {
+					afterDecimal = (+(removeSeparator(afterDecimal).slice(0, -1))).toLocaleString();
 				}else {
 					currOperand = (+(removeSeparator(currOperand).slice(0, -1))).toLocaleString();
 				}
+
+				if(afterDecimal === '0') afterDecimal = '';
 				if(currOperand === '0') currOperand = '';
 				break;
 
 				// CE resets all of the operands and the operation
 			case 'CE':
+				afterDecimal = '';
 				prevOperand = '';
 				currOperation = '';
 				currOperand = '';
@@ -121,6 +130,7 @@ function deleteNum(deleteType) {
 
 				// C clears the current operand
 			case 'C':
+				afterDecimal = '';
 				currOperand = '';
 				break;
 
@@ -137,7 +147,7 @@ function removeSeparator(str) {
 
 function updateDisplay() {
 	prevOperandDisplay.textContent = `${prevOperand} ${currOperation}`;
-	currOperandDisplay.textContent = currOperand;
+	currOperandDisplay.textContent = `${currOperand}${afterDecimal}`;
 }
 
 // set focus to the last element of operationBtns, or the equals button
