@@ -13,7 +13,7 @@ let afterDecimal = '';
 
 // append a number to the current operand
 function appendNum(num) {
-	if((removeSeparator(currOperand) + removeSeparator(afterDecimal)).length >= charLimit) return;
+	if(checkCharLimit(removeSeparator(currOperand) + removeSeparator(afterDecimal))) return;
 
 	if(num === '.') {
 		if(currOperand.includes('.')) return;
@@ -26,15 +26,27 @@ function appendNum(num) {
 	}else if(num === '0' && currOperand === '') {
 		currOperand = '0';
 	}else if(currOperand.includes('.')) {
-		afterDecimal = (+(removeSeparator(afterDecimal) + num)).toLocaleString();
+		const noSeparator = removeSeparator(afterDecimal);
+
+		if(noSeparator.length % 3 === 0 && noSeparator.length !== 0) afterDecimal += ',';
+		afterDecimal += num;
 	}else {
-		currOperand = (+(removeSeparator(currOperand) + num)).toLocaleString();
+		currOperand = removeSeparator(currOperand) + num;
+	}
+}
+
+// if operation is =, then do compute instead of setOperation
+function checkOperationType(operation) {
+	if(operation === '=') {
+		compute();
+	}else {
+		setOperation(operation);
 	}
 }
 
 // set the operation
 function setOperation(operation) {
-	// if current operand is empty and operation is -, then set as negative
+	// if current operand is empty or - and operation is -, then set as negative
 	if(operation === '-' && (currOperand === '' || currOperand === '-')) {
 		currOperand = '-';
 		return;
@@ -48,10 +60,7 @@ function setOperation(operation) {
 		compute();
 	}
 
-	if(operation === '=') return;
-
-	if(prevOperand !== ''
-	&& currOperation !== '') {
+	if(prevOperand !== '' && currOperation !== '') {
 		currOperation = operation;
 	}else {
 		prevOperand = currOperand + afterDecimal;
@@ -92,15 +101,25 @@ function compute() {
 			return;
 	}
 
-	if(newOperand.toString().length >= charLimit) {
+	if(checkCharLimit(newOperand)) {
 		alert('Numbers are too large, please try smaller numbers');
-		return;
-	}
+	}else {
+		newOperand = newOperand.toFixed(2);
 
-	currOperand = (+(newOperand.toFixed(2))).toLocaleString();
-	afterDecimal = '';
-	prevOperand = '';
-	currOperation = '';
+		currOperand = newOperand;
+		afterDecimal = '';
+		prevOperand = '';
+		currOperation = '';
+	}
+}
+
+// check if string is past character limit (for overflows)
+function checkCharLimit(str) {
+	return str.toString().length >= charLimit;
+}
+
+function removeLastChar(str) {
+	return removeSeparator(str).slice(0, -1);
 }
 
 // does all the delete functions
@@ -116,9 +135,14 @@ function deleteNum(deleteType) {
 			// DEL removes the last number inputed from the current operand
 			case 'DEL':
 				if(afterDecimal !== '') {
-					afterDecimal = (+(removeSeparator(afterDecimal).slice(0, -1))).toLocaleString();
+					afterDecimal = removeSeparator(removeLastChar(afterDecimal));
 				}else {
-					currOperand = (+(removeSeparator(currOperand).slice(0, -1))).toLocaleString();
+					let operand = currOperand;
+
+					operand = removeLastChar(currOperand);
+					operand = removeSeparator(operand);
+
+					currOperand = operand;
 				}
 
 				if(afterDecimal === '0') afterDecimal = '';
@@ -151,8 +175,17 @@ function removeSeparator(str) {
 }
 
 function updateDisplay() {
-	prevOperandDisplay.textContent = `${prevOperand} ${currOperation}`;
-	currOperandDisplay.textContent = `${currOperand}${afterDecimal}`;
+	if(prevOperand !== '') {
+		prevOperandDisplay.textContent = `${(+prevOperand).toLocaleString()} ${currOperation}`;
+	}
+
+	if(currOperand.includes('.')) {
+		currOperandDisplay.textContent = `${(+currOperand).toLocaleString()}.${afterDecimal}`;
+	}else if(currOperand !== '') {
+		currOperandDisplay.textContent = `${(+currOperand).toLocaleString()}${afterDecimal}`;
+	}else {
+		currOperandDisplay.textContent = '';
+	}
 }
 
 // set focus to the last element of operationBtns, or the equals button
@@ -234,7 +267,7 @@ function setEventListeners() {
 
 	for(const btn of operationBtns) {
 		btn.addEventListener('click', (e) => {
-			setOperation(e.target.textContent);
+			checkOperationType(e.target.textContent);
 			afterBtnPress();
 		});
 	}
