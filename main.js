@@ -124,7 +124,7 @@ function compute() {
 			return;
 	}
 
-	newOperand = newOperand.toFixed(3);
+	newOperand = (+(newOperand.toFixed(3))).toString();
 
 	if(checkCharLimit(newOperand)) {
 		alert('Numbers are too large, please try smaller numbers');
@@ -133,6 +133,7 @@ function compute() {
 			hasDecimal = true;
 			[currOperand, afterDecimal] = newOperand.split('.');
 		}else {
+			hasDecimal = false;
 			currOperand = newOperand;
 			afterDecimal = '';
 		}
@@ -299,13 +300,10 @@ function handleKeyboard(e) {
 			setOperation('×');
 			break;
 
+		case 'Enter':
 		case '=':
 			if(prevOperand !== ''
 			&& currOperand !== '') compute();
-			break;
-
-		case '.':
-			appendNum('.');
 			break;
 
 		case 'Backspace': {
@@ -315,8 +313,17 @@ function handleKeyboard(e) {
 			deleteNum(delString); }
 			break;
 
-		case 'Enter':
-			compute();
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+		case '.':
+			appendNum(key);
 			break;
 
 		default:
@@ -324,9 +331,9 @@ function handleKeyboard(e) {
 	}
 
 	// Check for num keys
-	if(key.match(/[0-9]/)) {
-		appendNum(key);
-	}
+	// if(key.match(/[0-9]/)) {
+	// 	appendNum(key);
+	// }
 }
 
 function afterBtnPress() {
