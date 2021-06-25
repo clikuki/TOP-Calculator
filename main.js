@@ -95,7 +95,7 @@ function setOperation(operation) {
 
 function compute() {
 	const a = +prevOperand;
-	const b = parseFloat(currOperand + afterDecimal);
+	const b = +`${currOperand}.${afterDecimal}`;
 
 	let newOperand;
 
