@@ -9,7 +9,9 @@ const charLimit = 15; // If the numbers are larger than this, then it will overf
 let hasDecimal = false;
 let prevOperand = '';
 let currOperation = '';
+// whole number part of current operand
 let currOperand = '';
+// decimal part of current operand
 let afterDecimal = '';
 
 // append a number to the current operand
@@ -42,8 +44,9 @@ function commaEvery3Chars(str) {
 	const strArray = str.split('');
 
 	for(let i = 0; i < strArray.length; i++) {
+		// if index is divisible by 3 and is not 0, then
+		// go to the element on index down and add a comma
 		if(i % 3 === 0 && i !== 0) {
-			// commaIndices.unshift(i);
 			strArray[i - 1] += ',';
 		}
 	}
@@ -97,6 +100,7 @@ function compute() {
 	const a = +prevOperand;
 	const b = +`${currOperand}.${afterDecimal}`;
 
+	// variable to hold answer
 	let newOperand;
 
 	switch(currOperation) {
@@ -148,7 +152,7 @@ function checkCharLimit(str) {
 	return str.toString().length >= charLimit;
 }
 
-function removeLastChar(str) {
+function removeLastChars(str) {
 	return str.slice(0, -1);
 }
 
@@ -171,13 +175,8 @@ function deleteNum(deleteType) {
 		switch(deleteType) {
 			case 'DEL': // DEL removes the last number inputed from the current operand
 				switch(true) {
-					// if the second lsat character is a comma, then remove last char twice
-					case afterDecimal[afterDecimal.length - 2] === ',':
-						afterDecimal = removeLastChar(afterDecimal);
-						// fallthrough!
-
 					case afterDecimal !== '':
-						afterDecimal = removeLastChar(afterDecimal);
+						afterDecimal = removeLastChars(afterDecimal);
 						break;
 
 					case hasDecimal:
@@ -193,7 +192,7 @@ function deleteNum(deleteType) {
 						break;
 
 					default:
-						currOperand = removeLastChar(currOperand);
+						currOperand = removeLastChars(currOperand);
 						break;
 				}
 				break;
@@ -219,7 +218,7 @@ function updateDisplay() {
 	let prevOperandDisplayText = `${(+prevOperand).toLocaleString()} ${currOperation}`;
 	let currOperandDisplayText = `${(+currOperand).toLocaleString()}`;
 
-	// modift prevOperandDisplayText if true;
+	// modify prevOperandDisplayText if true;
 	switch(true) {
 		case prevOperand === '':
 			prevOperandDisplayText = '';
@@ -329,18 +328,15 @@ function handleKeyboard(e) {
 		default:
 			break;
 	}
-
-	// Check for num keys
-	// if(key.match(/[0-9]/)) {
-	// 	appendNum(key);
-	// }
 }
 
+// do after pressing key or button
 function afterBtnPress() {
 	updateDisplay();
 	setFocusToEqualsBtn();
 }
 
+// sets the required event listeners
 function setEventListeners() {
 	window.addEventListener('keydown', (e) => {
 		handleKeyboard(e);
