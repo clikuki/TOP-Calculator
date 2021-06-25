@@ -26,6 +26,8 @@
         "no-floating-decimal": "off",
         "arrow-body-style": "off",
         "no-restricted-syntax": "off",
-        "no-alert": "off"
+        "no-alert": "off",
+        "no-fallthrough": ["error", { "commentPattern": "fallthrough!" }],
+        "prefer-const": ["error", {"destructuring": "all"}]
     }
 }

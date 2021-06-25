@@ -14,24 +14,41 @@ let afterDecimal = '';
 
 // append a number to the current operand
 function appendNum(num) {
-	if(checkCharLimit(currOperand + removeSeparator(afterDecimal))) return;
+	if(checkCharLimit(currOperand + afterDecimal)) return;
 
-	if(num === '.') {
-		if(currOperand === '') {
+	switch(true) {
+		case num === '.':
+			if(currOperand === '') currOperand = '0';
+
+			hasDecimal = true;
+			break;
+
+		case num === '0' && currOperand === '':
 			currOperand = '0';
-		}
+			break;
 
-		hasDecimal = true;
-	}else if(num === '0' && currOperand === '') {
-		currOperand = '0';
-	}else if(hasDecimal) {
-		const noSeparator = removeSeparator(afterDecimal);
+		case hasDecimal:
+			afterDecimal += num;
+			break;
 
-		if(noSeparator.length % 3 === 0 && noSeparator.length !== 0) afterDecimal += ',';
-		afterDecimal += num;
-	}else {
-		currOperand += num;
+		default:
+			currOperand += num;
+			break;
 	}
+}
+
+// add commas every 3 characters(for decimals)
+function commaEvery3Chars(str) {
+	const strArray = str.split('');
+
+	for(let i = 0; i < strArray.length; i++) {
+		if(i % 3 === 0 && i !== 0) {
+			// commaIndices.unshift(i);
+			strArray[i - 1] += ',';
+		}
+	}
+
+	return strArray.join('');
 }
 
 // if operation is =, then do compute instead of setOperation
@@ -52,7 +69,8 @@ function setOperation(operation) {
 	}
 
 	// don't set operation if current and previous operand is empty
-	if(currOperand === '' && prevOperand === '') return;
+	if(currOperand === '' && afterDecimal === ''
+	&& prevOperand === '' && !hasDecimal) return;
 
 	if(currOperand !== '' && prevOperand !== '') {
 		// if current and previous operand arent empty, then compute and set operation
@@ -62,8 +80,14 @@ function setOperation(operation) {
 	if(prevOperand !== '' && currOperation !== '') {
 		currOperation = operation;
 	}else {
-		prevOperand = currOperand + afterDecimal;
-		afterDecimal = '';
+		prevOperand = currOperand;
+
+		if(hasDecimal) {
+			hasDecimal = false;
+			prevOperand += `.${afterDecimal}`;
+			afterDecimal = '';
+		}
+
 		currOperand = '';
 		currOperation = operation;
 	}
@@ -71,7 +95,7 @@ function setOperation(operation) {
 
 function compute() {
 	const a = +prevOperand;
-	const b = parseFloat(currOperand + removeSeparator(afterDecimal));
+	const b = parseFloat(currOperand + afterDecimal);
 
 	let newOperand;
 
@@ -91,22 +115,28 @@ function compute() {
 		case '÷':
 			if(b === 0) {
 				alert('No dividing by 0!');
-				return;
+			}else {
+				newOperand = a / b;
 			}
-			newOperand = a / b;
 			break;
 
 		default:
 			return;
 	}
 
+	newOperand = newOperand.toFixed(3);
+
 	if(checkCharLimit(newOperand)) {
 		alert('Numbers are too large, please try smaller numbers');
 	}else {
-		newOperand = newOperand.toFixed(2);
+		if(newOperand.includes('.')) {
+			hasDecimal = true;
+			[currOperand, afterDecimal] = newOperand.split('.');
+		}else {
+			currOperand = newOperand;
+			afterDecimal = '';
+		}
 
-		currOperand = newOperand;
-		afterDecimal = '';
 		prevOperand = '';
 		currOperation = '';
 	}
@@ -125,41 +155,54 @@ function removeLastChar(str) {
 function deleteNum(deleteType) {
 	// if current operand is empty, move prevOperand to currOperand and
 	// set current operation and previous operand as empty
-	if(currOperand === '') {
+	if(currOperand === ''
+	&& afterDecimal === ''
+	&& !hasDecimal) {
 		currOperation = '';
-		currOperand = prevOperand;
+		if(prevOperand.includes('.')) {
+			hasDecimal = true;
+			[currOperand, afterDecimal] = prevOperand.split('.');
+		}else {
+			currOperand = prevOperand;
+		}
 		prevOperand = '';
 	}else {
 		switch(deleteType) {
-			// DEL removes the last number inputed from the current operand
-			case 'DEL':
-				if(afterDecimal !== '') {
-					afterDecimal = removeLastChar(afterDecimal);
-
-					if(afterDecimal[afterDecimal.length - 1] === ',') {
+			case 'DEL': // DEL removes the last number inputed from the current operand
+				switch(true) {
+					// if the second lsat character is a comma, then remove last char twice
+					case afterDecimal[afterDecimal.length - 2] === ',':
 						afterDecimal = removeLastChar(afterDecimal);
-					}
-				}else if(hasDecimal) {
-					hasDecimal = false;
-				}else {
-					currOperand = removeLastChar(currOperand);
-				}
+						// fallthrough!
 
-				if(afterDecimal === '0') afterDecimal = '';
-				if(currOperand === '0') currOperand = '';
+					case afterDecimal !== '':
+						afterDecimal = removeLastChar(afterDecimal);
+						break;
+
+					case hasDecimal:
+						hasDecimal = false;
+						break;
+
+					case afterDecimal === '0':
+						afterDecimal = '';
+						break;
+
+					case currOperand === '0':
+						currOperand = '';
+						break;
+
+					default:
+						currOperand = removeLastChar(currOperand);
+						break;
+				}
 				break;
 
-				// CE resets all of the operands and the operation
-			case 'CE':
-				hasDecimal = false;
-				afterDecimal = '';
+			case 'CE': // CE resets all of the operands and the operation
 				prevOperand = '';
 				currOperation = '';
-				currOperand = '';
-				break;
+				// fallthrough!
 
-				// C clears the current operand
-			case 'C':
+			case 'C': // C clears the current operand
 				hasDecimal = false;
 				afterDecimal = '';
 				currOperand = '';
@@ -171,27 +214,52 @@ function deleteNum(deleteType) {
 	}
 }
 
-// removes comma separators
-function removeSeparator(str) {
-	return str.replace(/,/g, '');
-}
-
 function updateDisplay() {
-	if(prevOperand !== '') {
-		prevOperandDisplay.textContent = `${(+prevOperand).toLocaleString()} ${currOperation}`;
-	}else {
-		prevOperandDisplay.textContent = '';
+	let prevOperandDisplayText = `${(+prevOperand).toLocaleString()} ${currOperation}`;
+	let currOperandDisplayText = `${(+currOperand).toLocaleString()}`;
+
+	// modift prevOperandDisplayText if true;
+	switch(true) {
+		case prevOperand === '':
+			prevOperandDisplayText = '';
+			break;
+
+		case prevOperand.includes('.'): {
+			let [wholeNumber, decimal] = prevOperand.split('.');
+
+			decimal = commaEvery3Chars(decimal);
+
+			prevOperandDisplayText = `${wholeNumber}.${decimal} ${currOperation}`; }
+			break;
+
+		default:
+			break;
 	}
 
-	if(currOperand === '-') {
-		currOperandDisplay.textContent = '-';
-	}else if(hasDecimal) {
-		currOperandDisplay.textContent = `${(+currOperand).toLocaleString()}.${afterDecimal}`;
-	}else if(currOperand !== '') {
-		currOperandDisplay.textContent = `${(+currOperand).toLocaleString()}${afterDecimal}`;
-	}else {
-		currOperandDisplay.textContent = '';
+	// modify currOperandDisplayText if true
+	switch(true) {
+		case hasDecimal:
+			currOperandDisplayText += '.';
+			// fallthrough!
+
+		case afterDecimal !== '':
+			currOperandDisplayText += `${commaEvery3Chars(afterDecimal)}`;
+			break;
+
+		case currOperandDisplayText === '0' && currOperand !== '0':
+			currOperandDisplayText = '';
+			break;
+
+		case currOperand === '-':
+			currOperandDisplayText = '-';
+			break;
+
+		default:
+			break;
 	}
+
+	prevOperandDisplay.textContent = prevOperandDisplayText;
+	currOperandDisplay.textContent = currOperandDisplayText;
 }
 
 // set focus to the last element of operationBtns, or the equals button
@@ -201,6 +269,15 @@ function setFocusToEqualsBtn() {
 
 // Handle all keyboard input
 function handleKeyboard(e) {
+	// return if ctrl+shift+I for debugging purposes
+	if(e.ctrlKey && e.shiftKey && e.key === 'I') return;
+
+	// Allow for user to reload with ctrl + r
+	if(e.ctrlKey && e.key === 'r') return;
+
+	// prevent default key event
+	e.preventDefault();
+
 	const key = e.key;
 
 	switch(key) {
@@ -223,30 +300,33 @@ function handleKeyboard(e) {
 			break;
 
 		case '=':
-			if(prevOperand !== '' && currOperand !== '') {
-				compute();
-			}
+			if(prevOperand !== ''
+			&& currOperand !== '') compute();
 			break;
 
 		case '.':
 			appendNum('.');
 			break;
 
-		case 'Backspace':
-			if(e.ctrlKey) deleteNum('C');
-			else deleteNum('DEL');
+		case 'Backspace': {
+			let delString = 'DEL';
+			if(e.ctrlKey) delString = 'C';
+
+			deleteNum(delString); }
 			break;
 
 		case 'Enter':
 			compute();
 			break;
 
-		default: // Check for num keys
-			if(key.match(/[0-9]/)) appendNum(key);
+		default:
 			break;
 	}
 
-	// console.log(e);
+	// Check for num keys
+	if(key.match(/[0-9]/)) {
+		appendNum(key);
+	}
 }
 
 function afterBtnPress() {
@@ -256,10 +336,6 @@ function afterBtnPress() {
 
 function setEventListeners() {
 	window.addEventListener('keydown', (e) => {
-		// return if ctrl+shift+I for debugging purposes
-		if(e.ctrlKey && e.shiftKey && e.key === 'I') return;
-		if(e.ctrlKey && e.key === 'r') return;
-		e.preventDefault();
 		handleKeyboard(e);
 		afterBtnPress();
 	});
