@@ -306,8 +306,18 @@ function handleKeyboard(e) {
 			break;
 
 		case 'Backspace': {
+			// default - Delete
 			let delString = 'DEL';
-			if(e.ctrlKey) delString = 'C';
+
+			// if ctrl is down, then set as C / Clear
+			if(e.ctrlKey) {
+				delString = 'C';
+
+				// If shift is also pressed, then add E to set as CE / Clear entries
+				if(e.ctrlKey && e.shiftKey) {
+					delString += 'E';
+				}
+			}
 
 			deleteNum(delString); }
 			break;
