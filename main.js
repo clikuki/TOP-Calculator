@@ -65,12 +65,6 @@ function checkOperationType(operation) {
 
 // set the operation
 function setOperation(operation) {
-	// if current operand is empty or - and operation is -, then set as negative
-	if(operation === '-' && (currOperand === '' || currOperand === '-')) {
-		currOperand = '-';
-		return;
-	}
-
 	// don't set operation if current and previous operand is empty
 	if(currOperand === '' && afterDecimal === ''
 	&& prevOperand === '' && !hasDecimal) return;
