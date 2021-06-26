@@ -303,15 +303,8 @@ function handleKeyboard(e) {
 			// default - Delete
 			let delString = 'DEL';
 
-			// if ctrl is down, then set as C / Clear
-			if(e.ctrlKey) {
-				delString = 'C';
-
-				// If shift is also pressed, then add E to set as CE / Clear entries
-				if(e.ctrlKey && e.shiftKey) {
-					delString += 'E';
-				}
-			}
+			if(e.ctrlKey && e.shiftKey) delString = 'CE';
+			if(e.ctrlKey) delString = 'C';
 
 			deleteNum(delString); }
 			break;
