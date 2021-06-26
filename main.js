@@ -309,6 +309,7 @@ function handleKeyboard(e) {
 			deleteNum(delString); }
 			break;
 
+		case '0':
 		case '1':
 		case '2':
 		case '3':
