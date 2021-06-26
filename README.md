@@ -16,5 +16,6 @@ A calculator made for TOP / [The Odin Project](https://www.theodinproject.com/)
 - **=** or **Enter** to solve equation
 - **Backspace** to delete last number put in
 - **Ctrl** + **Backspace** to delete current operand
+- **Ctrl** + **Shift** + **Backspace** to delete all operands
 - **Ctrl** + **-** to set current operand as negative
 - **.** to add decimal numbers
