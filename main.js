@@ -43,15 +43,15 @@ function appendNum(num) {
 function commaEvery3Chars(str) {
 	const strArray = str.split('');
 
-	for(let i = 0; i < strArray.length; i++) {
-		// if index is divisible by 3 and is not 0, then
-		// go to the element on index down and add a comma
+	const strWithCommas = strArray.map((char, i) => {
 		if(i % 3 === 0 && i !== 0) {
-			strArray[i - 1] += ',';
+			char = `,${char}`;
 		}
-	}
 
-	return strArray.join('');
+		return char;
+	}).join('');
+
+	return strWithCommas;
 }
 
 // if operation is =, then do compute instead of setOperation
